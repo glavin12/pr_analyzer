@@ -1,0 +1,34 @@
+# Environment / secrets — never commit real tokens
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# uv-managed virtual environment
+.venv/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Assistant / tool-local config (machine-specific, not for a shared repo)
+.claude/settings.local.json
+.claude/worktrees/
+.serena/
+
+# NOTE: tests/fixtures/raw_logs/ is intentionally NOT ignored.
+# Captured logs are committed regression fixtures, not build noise —
+# they're what makes Slice 1 "Done" demonstrable and feed the eval
+# harness later.

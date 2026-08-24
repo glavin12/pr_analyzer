@@ -1,0 +1,32 @@
+[project]
+name = "agentic-pr-analyzer"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "glavin12", email = "bhagyparmar727@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+]
+
+[project.scripts]
+agentic-pr-analyzer = "agentic_pr_analyzer:main"
+
+[build-system]
+requires = ["uv_build>=0.12.2,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: hits the real GitHub API over the network; excluded by default (run explicitly with `-m integration`).",
+]
+addopts = "-m 'not integration'"

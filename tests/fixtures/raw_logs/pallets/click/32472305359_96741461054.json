@@ -1,0 +1,13 @@
+{
+  "owner": "pallets",
+  "repo": "click",
+  "run_id": 32472305359,
+  "run_attempt": 1,
+  "job_id": 96741461054,
+  "job_name": "Windows",
+  "workflow_name": "Tests",
+  "conclusion": "failure",
+  "head_sha": "5aff05aa82c0356b701a2e71827817f4e5f81a86",
+  "html_url": "https://github.com/pallets/click/actions/runs/32472305359/job/96741461054",
+  "fetched_at": "2026-08-24T06:58:02.621818+00:00"
+}
