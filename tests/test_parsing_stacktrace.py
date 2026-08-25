@@ -62,6 +62,29 @@ def test_parse_python_traceback_chained_exception_keeps_final_e_line_and_all_fra
     assert trace.frames[1].line_number == 288
 
 
+def test_parse_python_traceback_bare_location_line_no_call_frame():
+    # pytest's default long-traceback shape for an assert directly in the
+    # test body: no "in <func>" frame at all, just the trailing crash
+    # location line.
+    text = (
+        "    def test_foo():\n"
+        "        x = 1\n"
+        ">       assert x == 2\n"
+        "E       assert 1 == 2\n"
+        "\n"
+        "tests/test_foo.py:42: AssertionError\n"
+    )
+    trace = parse_python_traceback(_lines(text))
+    assert trace is not None
+    assert len(trace.frames) == 1
+    frame = trace.frames[0]
+    assert frame.file_path == "tests/test_foo.py"
+    assert frame.line_number == 42
+    assert frame.function is None
+    assert frame.in_project is True
+    assert trace.message == "assert 1 == 2"
+
+
 def test_parse_python_traceback_in_project_heuristic_excludes_tooling_dirs():
     text = ".venv/lib/site-packages/pkg/mod.py:5: in run\n    pass\nE   ValueError: x\n"
     trace = parse_python_traceback(_lines(text))
