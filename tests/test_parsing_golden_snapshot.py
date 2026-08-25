@@ -41,7 +41,7 @@ def test_key_facts_about_the_real_failure():
     report = _parse_fixture()
     assert report.raw_line_count == 2323
     assert report.provider == "github_actions"
-    assert report.schema_version == "1.0"
+    assert report.schema_version == "1.1"
 
     process_failures = [
         d for d in report.diagnostics if d.type == DiagnosticType.PROCESS_FAILURE
@@ -50,6 +50,15 @@ def test_key_facts_about_the_real_failure():
     assert process_failures[0].exit_code == 1
     assert process_failures[0].evidence == (2307,)
     assert report.exit_code == 1
+
+    test_failures = [d for d in report.diagnostics if d.type == DiagnosticType.TEST_FAILURE]
+    assert len(test_failures) == 1
+    primary = test_failures[0]
+    assert primary.test_id == "tests/test_types.py::test_file_surrogates[type1]"
+    assert primary.file == "tests\\test_types.py"
+    assert primary.line == 288
+    assert report.primary_cluster is not None
+    assert report.primary_cluster.primary is primary
 
 
 def test_json_output_is_pure_ascii_and_valid():

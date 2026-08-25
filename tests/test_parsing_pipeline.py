@@ -26,7 +26,7 @@ def test_parse_log_stats_and_metadata_populated():
     assert report.stats["lines_processed"] == 1
     assert report.stats["parser_selected"] == "generic"
     assert report.provider == "github_actions"
-    assert report.schema_version == "1.0"
+    assert report.schema_version == "1.1"
 
 
 def test_parse_log_with_no_diagnostics_has_no_primary_cluster():

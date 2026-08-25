@@ -8,14 +8,14 @@ This is the fast-orientation file for this repo — what to read first to know w
 
 ## 2. Current status
 
-**Phase 1, Slice 0 (dev access) + Slice 1 (GitHub CI ingestion): done. Slice 2 (log-parsing engine): Section 1 of 7 done.**
+**Phase 1, Slice 0 (dev access) + Slice 1 (GitHub CI ingestion): done. Slice 2 (log-parsing engine): Sections 1-3 of 7 done.**
 
 - [x] Slice 0 — repo contract: `.env`/`.env.example`, `.gitignore`, config loader, GitHub client, `verify` CLI command working against the live API.
 - [x] Slice 1 — GitHub CI ingestion: auto-discovers the latest failed workflow run, fetches failed job logs, saves them as committed fixtures (`tests/fixtures/raw_logs/<owner>/<repo>/`). `ingest` CLI command working against the live API.
 - [ ] Slice 2 — deterministic log-parsing engine. **Contract change (2026-08-24):** the former compact "Slice 2 parser" is superseded by a full production-grade engine (`src/agentic_pr_analyzer/parsing/`), built section by section — still deterministic, LLM-free, stdlib-only:
   - [x] Section 1 — foundation & engine contracts: canonical model (`model.py`), provider seam (`GitHubActionsProvider` + `GenericProvider`), normalization + segmentation, `ParseLimits`, total-function guarantee (never raises), basic secret masking, parser registry holding only `GenericParser`. `parse` CLI command working against a saved fixture, no token/network needed.
-  - [ ] Section 2 — Python/pytest parser (not started)
-  - [ ] Section 3 — stack-trace & test-runner abstractions across ecosystems (not started)
+  - [x] Section 2 — Python/pytest parser: `parsers/pytest_parser.py`, validated against the committed `pallets/click` anchor fixture (`tests/test_types.py::test_file_surrogates[type1]`, primary cluster, `report.exit_code == 1` preserved).
+  - [x] Section 3 — stack-trace & test-runner abstractions across ecosystems: shared `stacktrace.py` (`parse_python_traceback`/`parse_js_stack`/`primary_frame`) and `model.TestOutcome` taxonomy, proven by a single `JsTestParser` covering both jest and vitest (synthetic fixtures under `tests/fixtures/raw_logs/SYNTHETIC/`, clearly marked — no real red jest/vitest run captured yet; swap in a real `ingest` capture when one is seen). `SCHEMA_VERSION` bumped 1.0 → 1.1 (additive: `TestOutcome`). Exit-code extraction refactored out of `GenericParser` into shared `process_failure.py` so specialized parsers can co-emit the same PROCESS_FAILURE without the registry's fallback-suppression dropping it.
   - [ ] Section 4 — compiler & static-analysis diagnostics (tsc/eslint/gcc/clang/rustc/javac) (not started)
   - [ ] Section 5 — correlation, deduplication & failure clustering (not started)
   - [ ] Section 6 — scale & robustness (streaming, bounded memory, perf) (not started)
@@ -34,7 +34,7 @@ This is the fast-orientation file for this repo — what to read first to know w
 Six layers, bottom-up (full rationale in the brief §3):
 
 1. **Data layer** — pull CI logs and PR diffs from the GitHub Actions API. *(built: `github/client.py`, `github/ingestion.py`)*
-2. **Core engine (the moat, zero AI)** — deterministic log-parsing engine (`parsing/`, 7 sections), diff correlator, breakage predictor, context assembler. *(in progress — parsing engine Section 1/7 done; diff correlator+ = Slice 3+)*
+2. **Core engine (the moat, zero AI)** — deterministic log-parsing engine (`parsing/`, 7 sections), diff correlator, breakage predictor, context assembler. *(in progress — parsing engine Sections 1-3/7 done; diff correlator+ = Slice 3+)*
 3. **Model layer** — a cheap LLM API turns clean context into judgment (cause + fix). *(not started — Slice 4)*
 4. **Orchestration loop** — hand-rolled plan → act → verify agent loop. *(not started — Slice 5)*
 5. **Surfaces** — web app (primary), MCP server (secondary). *(not started)*
@@ -53,21 +53,24 @@ src/agentic_pr_analyzer/
 │   ├── models.py            # RawLog evidence model + save_raw_log/load_raw_log disk seam
 │   └── ingestion.py           # resolve failed run -> fetch logs -> save fixtures
 └── parsing/              # deterministic log-parsing engine (Slice 2, built section by section)
-    ├── model.py              # canonical dataclasses/enums + to_dict/to_json, SCHEMA_VERSION
+    ├── model.py              # canonical dataclasses/enums + to_dict/to_json, SCHEMA_VERSION, TestOutcome
     ├── limits.py              # ParseLimits (bounds + defaults)
     ├── sanitize.py             # basic secret masking (high-risk patterns; full matrix = Section 7)
     ├── confidence.py            # deterministic confidence rule table (constants, never model-derived)
     ├── normalizer.py             # raw text -> LogLine list (dual raw_text/text, ANSI/timestamp/marker)
     ├── segmentation.py            # LogLine list -> LogSection tree (group/endgroup nesting)
-    ├── pipeline.py                 # parse_log(): stages + ParseLimits + total-function guard + stats
-    ├── providers/                   # LogProvider seam: github_actions.py, generic.py fallback
-    └── parsers/                      # Parser registry: generic_parser.py (pytest = Section 2)
+    ├── stacktrace.py               # Section 3: parse_python_traceback/parse_js_stack + primary_frame, shared
+    ├── process_failure.py           # shared `##[error]...exit code N` -> PROCESS_FAILURE (extracted from GenericParser)
+    ├── pipeline.py                   # parse_log(): stages + ParseLimits + total-function guard + stats
+    ├── providers/                     # LogProvider seam: github_actions.py, generic.py fallback
+    └── parsers/                        # registry: pytest_parser.py, js_test_parser.py (jest+vitest), generic_parser.py
 tests/
 ├── test_config.py, test_github_client.py, test_ingestion.py, test_load_raw_log.py, test_cli_parse.py
-├── test_parsing_*.py   # providers/normalizer/sanitize/segmentation/confidence/limits/
-│                         generic_parser/pipeline/golden-snapshot/fuzz-security
+├── test_parsing_*.py   # providers/normalizer/sanitize/segmentation/confidence/limits/stacktrace/
+│                         generic_parser/pytest_parser/js_test_parser/pipeline/golden-snapshot/fuzz-security
 └── fixtures/
     ├── raw_logs/<owner>/<repo>/<run_id>_<job_id>.{log,json}  # real captured fixtures, committed
+    ├── raw_logs/SYNTHETIC/                                    # hand-written jest/vitest fixtures, clearly marked (see its README)
     └── parsed/<owner>/<repo>/<run_id>_<job_id>.json            # golden-snapshot FailureReport JSON
 docs/project-brief.md   # full design doc
 ```
@@ -105,7 +108,7 @@ Carried forward from the brief (§2.1) — these are operating constraints, not 
 - Unit tests are mocked/offline by default (`uv run pytest`) — no network access, no real token needed.
 - Real-network tests use the `integration` pytest marker and are excluded by default (`addopts = "-m 'not integration'"` in `pyproject.toml`); run explicitly with `uv run pytest -m integration`.
 - `GitHubClient` is tested by injecting a mocked `requests.Session` via its constructor — no HTTP-mocking dependency needed.
-- Fixtures under `tests/fixtures/raw_logs/` are real logs captured by actually running `agentic-pr-analyzer ingest` against a real public repo — not synthetic data. They're committed (not gitignored) since they're regression fixtures, not build noise.
+- Fixtures under `tests/fixtures/raw_logs/` are real logs captured by actually running `agentic-pr-analyzer ingest` against a real public repo — not synthetic data, with one deliberate exception: `tests/fixtures/raw_logs/SYNTHETIC/` (Section 3's jest/vitest fixtures), hand-written and clearly marked because no red public jest/vitest run was captured yet — replace with a real `ingest` capture the first time one is seen.
 - The parsing engine's golden-snapshot fixture lives at `tests/fixtures/parsed/<owner>/<repo>/<run_id>_<job_id>.json`. Regenerate it (after an intentional output-format change, never to paper over a real regression) with the one-liner documented at the top of `tests/test_parsing_golden_snapshot.py`.
 - Write tests before implementing a new section/slice. If a test fails after implementation, the default assumption is the implementation is wrong; only change the test once you've confirmed the test itself was asserting the wrong thing, not merely inconvenient for the code as written.
 
@@ -113,7 +116,7 @@ Carried forward from the brief (§2.1) — these are operating constraints, not 
 
 Documented deferrals, not oversights — don't build ahead of the current slice:
 
-- Tool-specific log parsing beyond `GenericParser` — pytest/jest/vitest/tsc/eslint/gcc/clang/rustc/javac each need their own parser + real fixture (Sections 2–4). Rich stack-trace/test-failure extraction, cross-diagnostic clustering, streaming/perf, and the full secret-masking matrix are Sections 3, 5, 6, and 7 respectively.
+- Tool-specific compiler/lint diagnostics — tsc/eslint/gcc/clang/rustc/javac each need their own parser + real fixture (Section 4). Go/Java/Rust/C++ stack traces are likewise deferred (`stacktrace.py` is shaped so each is an additive `parse_<lang>_stack` function, not a refactor). Cross-diagnostic clustering/deduplication, streaming/perf, and the full secret-masking matrix are Sections 5, 6, and 7 respectively.
 - Diff extraction, PR-diff correlation, any LLM/AI calls, autofixes (Slices 3–4+).
 - GitHub Actions CI for this repo itself — technically possible now (`origin` already points at `github.com/glavin12/pr_analyzer`), but it's polish-checklist scope (brief §9), not required by any current slice.
 - OAuth/GitHub App auth — explicitly v2 per the brief's first implementation rule.
