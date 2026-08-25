@@ -152,13 +152,21 @@ For V1 development, use a GitHub `workflow_run`-based trigger or an equivalent l
 
 *Done =* a real failed workflow can be converted into a local raw-log fixture without manual copying.
 
-### Slice 2 — log normalization and deterministic parser
+### Slice 2 — deterministic log-parsing engine
 
-Build the normalizer and parser independently of GitHub. Extract failure type, message, file/line/test information where available, stack trace/command metadata, and traceable evidence ranges. Unknown failures must remain `UNKNOWN` rather than being guessed.
+**Contract change (2026-08-24):** the original compact "normalizer + parser" scope below is superseded. Slice 2 is now a full production-grade deterministic log-processing engine (`src/agentic_pr_analyzer/parsing/`): raw log → normalized lines → sections → structured diagnostics → clusters → `FailureReport`. Still independent of GitHub, still zero AI/LLM/embeddings — stdlib only (`re`, `dataclasses`, `enum`, `pathlib`, `json`). Built **section by section**, each a runnable, tested vertical increment, so later sections add capability behind stable interfaces instead of forcing a core rewrite:
 
-Add regression fixtures for every failure class discovered.
+1. **Foundation, normalization core & engine contracts** — the canonical model, a `LogProvider` seam (detect + `GitHubActionsProvider` + `GenericProvider` fallback), a `ParseLimits` contract threaded through every stage, a total-function guarantee (`parse_log` never raises), basic secret masking, and a parser registry holding only the always-on `GenericParser`. *(done)*
+2. **Python/pytest parser** — the first real tool-specific parser, validated against the committed `pallets/click` anchor fixture.
+3. **Stack-trace & test-runner abstractions across ecosystems** — jest/vitest + a shared status taxonomy.
+4. **Compiler & static-analysis diagnostics** — tsc/eslint/gcc/clang/rustc/javac, each with its own real fixture.
+5. **Correlation, deduplication & failure clustering** — multi-diagnostic/multi-tool failure reports collapse into real clusters (Section 1 ships only trivial one-diagnostic-per-cluster).
+6. **Scale & robustness** — streaming, bounded memory, perf, consuming the `ParseLimits` seam Section 1 already built.
+7. **Security & observability hardening** — the full secret-masking provider matrix, metrics, confidence calibration.
 
-*Done =* `raw log → normalized log → structured FailureEvidenceBundle`, with deterministic tests.
+A deterministic parser cannot justify causal claims: diagnostics are always framed as a "primary diagnostic" / "failure origin candidate", never a "root cause". Extract failure type, message, file/line/test information where available, stack trace/command metadata, and traceable evidence ranges (raw line numbers, `raw_text` alongside normalized `text`). Unknown failures stay `DiagnosticType.UNKNOWN` rather than being guessed. Every tool-specific parser (Sections 2–4) adds a regression fixture for the failure class it covers.
+
+*Done (whole slice) =* `raw log → FailureReport`, with deterministic tests and real fixtures for every supported tool/ecosystem. *Done (Section 1, met) =* the engine spine, provider seam, `ParseLimits`, and total-function guarantee are in place and validated against the anchor fixture with golden-snapshot + fuzz/security tests, so Section 2's pytest parser plugs in with no core change.
 
 ### Slice 3 — diff extraction and deterministic correlation
 
