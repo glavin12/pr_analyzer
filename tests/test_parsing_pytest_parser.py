@@ -26,6 +26,26 @@ SINGLE_FAILURE_LOG = (
     + _TS + "##[error]Process completed with exit code 1.\n"
 )
 
+BARE_ASSERT_LOG = (
+    "============================= test session starts =============================\n"
+    "collected 12 items\n"
+    "\n"
+    "tests/test_parser.py ....F....\n"
+    "\n"
+    "================================== FAILURES ===================================\n"
+    "________________________ test_parse_invalid_timestamp ___________________________\n"
+    "\n"
+    "    def test_parse_invalid_timestamp():\n"
+    "        result = parse_log(\"2025-13-45 ERROR Something went wrong\")\n"
+    ">       assert result.timestamp is not None\n"
+    "E       AssertionError: assert None is not None\n"
+    "\n"
+    "tests/test_parser.py:42: AssertionError\n"
+    "=========================== short test summary info ===========================\n"
+    "FAILED tests/test_parser.py::test_parse_invalid_timestamp - AssertionError\n"
+    "========================= 1 failed, 11 passed ================================\n"
+)
+
 MALFORMED_LOG = (
     _TS + "============================= test session starts ==============================\n"
     + _TS + "================================== FAILURES ===================================\n"
@@ -102,6 +122,19 @@ def test_run_summary_metadata_is_parsed():
     assert d.metadata["run_summary"]["passed"] == 1
     assert d.metadata["run_summary"]["skipped"] == 1
     assert d.metadata["run_summary"]["duration_seconds"] == 0.12
+
+
+def test_bare_assert_with_no_call_frame_still_locates_file_and_line():
+    # Regression: a plain `assert` directly in the test body prints no
+    # "in <func>" frame at all, just the trailing crash-location line and
+    # an "E"-line indented further than 3 spaces -- both previously fell
+    # through stacktrace.py's frame/exception detection.
+    diags = _diagnostics_for(BARE_ASSERT_LOG)
+    d = next(d for d in diags if d.type == DiagnosticType.TEST_FAILURE)
+    assert d.file == "tests/test_parser.py"
+    assert d.line == 42
+    assert d.stack_trace is not None
+    assert d.stack_trace.message == "assert None is not None"
 
 
 def test_malformed_failures_block_degrades_to_partial_diagnostic_without_raising():
