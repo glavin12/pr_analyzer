@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 This is the fast-orientation file for this repo — what to read first to know what this project is, what's built, and what rules to follow while working on it. For the full design rationale, roadmap, and reasoning behind every decision below, see [`docs/project-brief.md`](docs/project-brief.md); this file summarizes and links rather than re-explaining it, so a changed detail only ever needs updating in one place.
 
@@ -27,7 +27,7 @@ This is the fast-orientation file for this repo — what to read first to know w
 - [ ] Slice 7 — fix generation (not started)
 - [ ] Slice 8+ — memory, dependency checking, private-repo support, OAuth, MCP, web UI, deployment, polish (not started)
 
-**Standing rule: update this checklist as part of the commit that completes each slice/section.** It must never go stale — a future session (including a future instance of Claude Code) reads this section first to know where the project actually stands.
+**Standing rule: update this checklist as part of the commit that completes each slice/section.** It must never go stale — a future session (including a future instance of Codex) reads this section first to know where the project actually stands.
 
 ## 3. Architecture
 
@@ -85,7 +85,7 @@ uv run agentic-pr-analyzer parse <path-to-saved-.log-fixture>
 uv run pytest
 ```
 
-## 6. Operating rules for Claude Code
+## 6. Operating rules for Codex
 
 Carried forward from the brief (§2.1) — these are operating constraints, not suggestions:
 

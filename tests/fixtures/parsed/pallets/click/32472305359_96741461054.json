@@ -1,0 +1,256 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "owner": "pallets",
+    "repo": "click",
+    "run_id": 32472305359,
+    "run_attempt": 1,
+    "job_id": 96741461054,
+    "job_name": "Windows",
+    "workflow_name": "Tests",
+    "conclusion": "failure",
+    "head_sha": "5aff05aa82c0356b701a2e71827817f4e5f81a86",
+    "html_url": "https://github.com/pallets/click/actions/runs/32472305359/job/96741461054",
+    "fetched_at": "2026-08-24T06:58:02.621818+00:00"
+  },
+  "provider": "github_actions",
+  "sections": [
+    {
+      "id": 0,
+      "title": "Runner Image Provisioner",
+      "kind": "group",
+      "start_lineno": 2,
+      "end_lineno": 9,
+      "parent_id": null
+    },
+    {
+      "id": 1,
+      "title": "Operating System",
+      "kind": "group",
+      "start_lineno": 10,
+      "end_lineno": 14,
+      "parent_id": null
+    },
+    {
+      "id": 2,
+      "title": "Runner Image",
+      "kind": "group",
+      "start_lineno": 15,
+      "end_lineno": 20,
+      "parent_id": null
+    },
+    {
+      "id": 3,
+      "title": "GITHUB_TOKEN Permissions",
+      "kind": "group",
+      "start_lineno": 21,
+      "end_lineno": 23,
+      "parent_id": null
+    },
+    {
+      "id": 4,
+      "title": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "kind": "group",
+      "start_lineno": 32,
+      "end_lineno": 48,
+      "parent_id": null
+    },
+    {
+      "id": 5,
+      "title": "Getting Git version info",
+      "kind": "group",
+      "start_lineno": 50,
+      "end_lineno": 54,
+      "parent_id": null
+    },
+    {
+      "id": 6,
+      "title": "Determining repository object format",
+      "kind": "group",
+      "start_lineno": 59,
+      "end_lineno": 60,
+      "parent_id": null
+    },
+    {
+      "id": 7,
+      "title": "Initializing the repository",
+      "kind": "group",
+      "start_lineno": 61,
+      "end_lineno": 65,
+      "parent_id": null
+    },
+    {
+      "id": 8,
+      "title": "Disabling automatic garbage collection",
+      "kind": "group",
+      "start_lineno": 66,
+      "end_lineno": 68,
+      "parent_id": null
+    },
+    {
+      "id": 9,
+      "title": "Setting up auth",
+      "kind": "group",
+      "start_lineno": 69,
+      "end_lineno": 84,
+      "parent_id": null
+    },
+    {
+      "id": 10,
+      "title": "Fetching the repository",
+      "kind": "group",
+      "start_lineno": 85,
+      "end_lineno": 89,
+      "parent_id": null
+    },
+    {
+      "id": 11,
+      "title": "Determining the checkout info",
+      "kind": "group",
+      "start_lineno": 90,
+      "end_lineno": 91,
+      "parent_id": null
+    },
+    {
+      "id": 12,
+      "title": "Checking out the ref",
+      "kind": "group",
+      "start_lineno": 94,
+      "end_lineno": 114,
+      "parent_id": null
+    },
+    {
+      "id": 13,
+      "title": "Removing auth",
+      "kind": "group",
+      "start_lineno": 117,
+      "end_lineno": 144,
+      "parent_id": null
+    },
+    {
+      "id": 14,
+      "title": "Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+      "kind": "group",
+      "start_lineno": 145,
+      "end_lineno": 170,
+      "parent_id": null
+    },
+    {
+      "id": 15,
+      "title": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+      "kind": "group",
+      "start_lineno": 208,
+      "end_lineno": 221,
+      "parent_id": null
+    },
+    {
+      "id": 16,
+      "title": "Installed versions",
+      "kind": "group",
+      "start_lineno": 222,
+      "end_lineno": 224,
+      "parent_id": null
+    },
+    {
+      "id": 17,
+      "title": "Run uv run --locked --no-default-groups --group dev tox run",
+      "kind": "group",
+      "start_lineno": 225,
+      "end_lineno": 239,
+      "parent_id": null
+    }
+  ],
+  "diagnostics": [
+    {
+      "type": "process_failure",
+      "severity": "error",
+      "tool": null,
+      "message": "Process completed with exit code 1.",
+      "file": null,
+      "line": null,
+      "column": null,
+      "source_range": {
+        "start": 2307,
+        "end": 2307
+      },
+      "stack_trace": null,
+      "test_id": null,
+      "exit_code": 1,
+      "confidence": 0.85,
+      "evidence": [
+        2307
+      ],
+      "metadata": {},
+      "parser": "generic"
+    }
+  ],
+  "clusters": [
+    {
+      "primary": {
+        "type": "process_failure",
+        "severity": "error",
+        "tool": null,
+        "message": "Process completed with exit code 1.",
+        "file": null,
+        "line": null,
+        "column": null,
+        "source_range": {
+          "start": 2307,
+          "end": 2307
+        },
+        "stack_trace": null,
+        "test_id": null,
+        "exit_code": 1,
+        "confidence": 0.85,
+        "evidence": [
+          2307
+        ],
+        "metadata": {},
+        "parser": "generic"
+      },
+      "related": [],
+      "section_id": null,
+      "classification": "process_failure"
+    }
+  ],
+  "primary_cluster": {
+    "primary": {
+      "type": "process_failure",
+      "severity": "error",
+      "tool": null,
+      "message": "Process completed with exit code 1.",
+      "file": null,
+      "line": null,
+      "column": null,
+      "source_range": {
+        "start": 2307,
+        "end": 2307
+      },
+      "stack_trace": null,
+      "test_id": null,
+      "exit_code": 1,
+      "confidence": 0.85,
+      "evidence": [
+        2307
+      ],
+      "metadata": {},
+      "parser": "generic"
+    },
+    "related": [],
+    "section_id": null,
+    "classification": "process_failure"
+  },
+  "exit_code": 1,
+  "raw_line_count": 2323,
+  "truncated": false,
+  "stats": {
+    "lines_processed": 2323,
+    "sections": 18,
+    "diagnostics_detected": 1,
+    "parser_selected": "generic",
+    "parse_failures": 0,
+    "truncated_lines": false,
+    "lines_over_limit": 0,
+    "diagnostics_truncated": false
+  }
+}

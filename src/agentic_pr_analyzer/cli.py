@@ -13,7 +13,9 @@ from .exceptions import (
     NoFailedJobsFoundError,
     NoFailedRunsFoundError,
 )
-from .github import GitHubClient, ingest_latest_failure
+from .github import GitHubClient, ingest_latest_failure, load_raw_log
+from .parsing import parse_log, to_json
+from .parsing.model import LogSource
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -24,12 +26,26 @@ def build_parser() -> argparse.ArgumentParser:
         "ingest", help="Fetch the latest failed CI run's logs as a fixture (Slice 1)."
     )
     ingest.add_argument("repo", help="owner/repo, e.g. psf/requests")
+    parse = sub.add_parser(
+        "parse", help="Parse a saved CI log fixture into a FailureReport (Section 1)."
+    )
+    parse.add_argument("logpath", help="Path to a .log file saved by `ingest` (needs its .json sidecar).")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
+        if args.command == "parse":
+            log_path = Path(args.logpath)
+            if not log_path.exists():
+                print(f"error: log file not found: {log_path}", file=sys.stderr)
+                return 4
+            raw = load_raw_log(log_path)
+            report = parse_log(raw.content, LogSource.from_raw_log(raw))
+            print(to_json(report))
+            return 0
+
         client = GitHubClient(token=load_settings().github_token)
 
         if args.command == "verify":

@@ -68,3 +68,29 @@ def save_raw_log(log: RawLog, base_dir: Path) -> Path:
         json.dumps(log.metadata_dict(), indent=2), encoding="utf-8", newline=""
     )
     return log_path
+
+
+def load_raw_log(log_path: Path) -> RawLog:
+    """Inverse of `save_raw_log`: reads `<log_path>` + its sibling `.json`
+
+    sidecar back into a `RawLog`. Uses `read_bytes().decode("utf-8")`
+    rather than `read_text()` — text mode re-applies universal-newline
+    translation on read, which would silently rewrite the exact `\r\n`
+    bytes `save_raw_log` took care to preserve.
+    """
+    content = log_path.read_bytes().decode("utf-8")
+    meta = json.loads(log_path.with_suffix(".json").read_text(encoding="utf-8"))
+    return RawLog(
+        owner=meta["owner"],
+        repo=meta["repo"],
+        run_id=meta["run_id"],
+        run_attempt=meta["run_attempt"],
+        job_id=meta["job_id"],
+        job_name=meta["job_name"],
+        workflow_name=meta["workflow_name"],
+        conclusion=meta["conclusion"],
+        head_sha=meta["head_sha"],
+        html_url=meta["html_url"],
+        fetched_at=datetime.fromisoformat(meta["fetched_at"]),
+        content=content,
+    )
