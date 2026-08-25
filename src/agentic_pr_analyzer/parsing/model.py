@@ -21,13 +21,29 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..github.models import RawLog
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 
 
 class Severity(Enum):
     ERROR = "error"
     WARNING = "warning"
     INFO = "info"
+
+
+class TestOutcome(Enum):
+    """Shared status taxonomy test-runner parsers (pytest, jest, vitest, ...)
+
+    map their tool-specific labels onto. Nuances that don't fit this
+    taxonomy (timeout, setup/teardown phase) live in `Diagnostic.metadata`
+    instead of growing this enum.
+    """
+
+    PASSED = "passed"
+    FAILED = "failed"
+    ERROR = "error"
+    SKIPPED = "skipped"
+    XFAILED = "xfailed"
+    XPASSED = "xpassed"
 
 
 class WorkflowMarker(Enum):

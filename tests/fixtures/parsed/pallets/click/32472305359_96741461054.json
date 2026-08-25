@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "source": {
     "owner": "pallets",
     "repo": "click",
@@ -162,6 +162,124 @@
   ],
   "diagnostics": [
     {
+      "type": "test_failure",
+      "severity": "error",
+      "tool": "pytest",
+      "message": "AssertionError: Reg...",
+      "file": "tests\\test_types.py",
+      "line": 288,
+      "column": null,
+      "source_range": {
+        "start": 2277,
+        "end": 2300
+      },
+      "stack_trace": {
+        "exception_type": "AssertionError",
+        "message": "Regex pattern did not match.",
+        "frames": [
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+            "line_number": 986,
+            "column": null,
+            "function": "convert",
+            "raw_lineno": 2278,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:986: in convert"
+          },
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\utils.py",
+            "line_number": 150,
+            "column": null,
+            "function": "__init__",
+            "raw_lineno": 2280,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\utils.py:150: in __init__"
+          },
+          {
+            "file_path": "tests\\test_types.py",
+            "line_number": 289,
+            "column": null,
+            "function": "test_file_surrogates",
+            "raw_lineno": 2286,
+            "in_project": true,
+            "raw_text": "tests\\test_types.py:289: in test_file_surrogates"
+          },
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+            "line_number": 1012,
+            "column": null,
+            "function": "convert",
+            "raw_lineno": 2288,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:1012: in convert"
+          },
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+            "line_number": 211,
+            "column": null,
+            "function": "fail",
+            "raw_lineno": 2290,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:211: in fail"
+          },
+          {
+            "file_path": "tests\\test_types.py",
+            "line_number": 288,
+            "column": null,
+            "function": "test_file_surrogates",
+            "raw_lineno": 2295,
+            "in_project": true,
+            "raw_text": "tests\\test_types.py:288: in test_file_surrogates"
+          }
+        ]
+      },
+      "test_id": "tests/test_types.py::test_file_surrogates[type1]",
+      "exit_code": null,
+      "confidence": 0.9,
+      "evidence": [
+        2049,
+        2277,
+        2278,
+        2279,
+        2280,
+        2281,
+        2282,
+        2283,
+        2284,
+        2285,
+        2286,
+        2287,
+        2288,
+        2289,
+        2290,
+        2291,
+        2292,
+        2293,
+        2294,
+        2295,
+        2296,
+        2297,
+        2298,
+        2299,
+        2300
+      ],
+      "metadata": {
+        "outcome": "failed",
+        "expected": "\"(\ufffd': No such file or directory|Illegal byte sequence|Invalid or incomplete multibyte or wide character)\"",
+        "actual": "\"'D:\\\\a\\\\click\\\\click\\\\.tox\\\\py3.14\\\\tmp\\\\test_file_surrogates_type1_0\\\\\ufffd': The system cannot find the file specified\"",
+        "run_summary": {
+          "failed": 1,
+          "passed": 1913,
+          "skipped": 102,
+          "deselected": 31000,
+          "xfailed": 1,
+          "duration_seconds": 6.41
+        },
+        "tb_style": "short"
+      },
+      "parser": "pytest"
+    },
+    {
       "type": "process_failure",
       "severity": "error",
       "tool": null,
@@ -181,10 +299,133 @@
         2307
       ],
       "metadata": {},
-      "parser": "generic"
+      "parser": "pytest"
     }
   ],
   "clusters": [
+    {
+      "primary": {
+        "type": "test_failure",
+        "severity": "error",
+        "tool": "pytest",
+        "message": "AssertionError: Reg...",
+        "file": "tests\\test_types.py",
+        "line": 288,
+        "column": null,
+        "source_range": {
+          "start": 2277,
+          "end": 2300
+        },
+        "stack_trace": {
+          "exception_type": "AssertionError",
+          "message": "Regex pattern did not match.",
+          "frames": [
+            {
+              "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+              "line_number": 986,
+              "column": null,
+              "function": "convert",
+              "raw_lineno": 2278,
+              "in_project": false,
+              "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:986: in convert"
+            },
+            {
+              "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\utils.py",
+              "line_number": 150,
+              "column": null,
+              "function": "__init__",
+              "raw_lineno": 2280,
+              "in_project": false,
+              "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\utils.py:150: in __init__"
+            },
+            {
+              "file_path": "tests\\test_types.py",
+              "line_number": 289,
+              "column": null,
+              "function": "test_file_surrogates",
+              "raw_lineno": 2286,
+              "in_project": true,
+              "raw_text": "tests\\test_types.py:289: in test_file_surrogates"
+            },
+            {
+              "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+              "line_number": 1012,
+              "column": null,
+              "function": "convert",
+              "raw_lineno": 2288,
+              "in_project": false,
+              "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:1012: in convert"
+            },
+            {
+              "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+              "line_number": 211,
+              "column": null,
+              "function": "fail",
+              "raw_lineno": 2290,
+              "in_project": false,
+              "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:211: in fail"
+            },
+            {
+              "file_path": "tests\\test_types.py",
+              "line_number": 288,
+              "column": null,
+              "function": "test_file_surrogates",
+              "raw_lineno": 2295,
+              "in_project": true,
+              "raw_text": "tests\\test_types.py:288: in test_file_surrogates"
+            }
+          ]
+        },
+        "test_id": "tests/test_types.py::test_file_surrogates[type1]",
+        "exit_code": null,
+        "confidence": 0.9,
+        "evidence": [
+          2049,
+          2277,
+          2278,
+          2279,
+          2280,
+          2281,
+          2282,
+          2283,
+          2284,
+          2285,
+          2286,
+          2287,
+          2288,
+          2289,
+          2290,
+          2291,
+          2292,
+          2293,
+          2294,
+          2295,
+          2296,
+          2297,
+          2298,
+          2299,
+          2300
+        ],
+        "metadata": {
+          "outcome": "failed",
+          "expected": "\"(\ufffd': No such file or directory|Illegal byte sequence|Invalid or incomplete multibyte or wide character)\"",
+          "actual": "\"'D:\\\\a\\\\click\\\\click\\\\.tox\\\\py3.14\\\\tmp\\\\test_file_surrogates_type1_0\\\\\ufffd': The system cannot find the file specified\"",
+          "run_summary": {
+            "failed": 1,
+            "passed": 1913,
+            "skipped": 102,
+            "deselected": 31000,
+            "xfailed": 1,
+            "duration_seconds": 6.41
+          },
+          "tb_style": "short"
+        },
+        "parser": "pytest"
+      },
+      "related": [],
+      "section_id": null,
+      "classification": "test_failure"
+    },
     {
       "primary": {
         "type": "process_failure",
@@ -206,7 +447,7 @@
           2307
         ],
         "metadata": {},
-        "parser": "generic"
+        "parser": "pytest"
       },
       "related": [],
       "section_id": null,
@@ -215,30 +456,126 @@
   ],
   "primary_cluster": {
     "primary": {
-      "type": "process_failure",
+      "type": "test_failure",
       "severity": "error",
-      "tool": null,
-      "message": "Process completed with exit code 1.",
-      "file": null,
-      "line": null,
+      "tool": "pytest",
+      "message": "AssertionError: Reg...",
+      "file": "tests\\test_types.py",
+      "line": 288,
       "column": null,
       "source_range": {
-        "start": 2307,
-        "end": 2307
+        "start": 2277,
+        "end": 2300
       },
-      "stack_trace": null,
-      "test_id": null,
-      "exit_code": 1,
-      "confidence": 0.85,
+      "stack_trace": {
+        "exception_type": "AssertionError",
+        "message": "Regex pattern did not match.",
+        "frames": [
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+            "line_number": 986,
+            "column": null,
+            "function": "convert",
+            "raw_lineno": 2278,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:986: in convert"
+          },
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\utils.py",
+            "line_number": 150,
+            "column": null,
+            "function": "__init__",
+            "raw_lineno": 2280,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\utils.py:150: in __init__"
+          },
+          {
+            "file_path": "tests\\test_types.py",
+            "line_number": 289,
+            "column": null,
+            "function": "test_file_surrogates",
+            "raw_lineno": 2286,
+            "in_project": true,
+            "raw_text": "tests\\test_types.py:289: in test_file_surrogates"
+          },
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+            "line_number": 1012,
+            "column": null,
+            "function": "convert",
+            "raw_lineno": 2288,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:1012: in convert"
+          },
+          {
+            "file_path": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py",
+            "line_number": 211,
+            "column": null,
+            "function": "fail",
+            "raw_lineno": 2290,
+            "in_project": false,
+            "raw_text": ".tox\\py3.14\\Lib\\site-packages\\click\\types.py:211: in fail"
+          },
+          {
+            "file_path": "tests\\test_types.py",
+            "line_number": 288,
+            "column": null,
+            "function": "test_file_surrogates",
+            "raw_lineno": 2295,
+            "in_project": true,
+            "raw_text": "tests\\test_types.py:288: in test_file_surrogates"
+          }
+        ]
+      },
+      "test_id": "tests/test_types.py::test_file_surrogates[type1]",
+      "exit_code": null,
+      "confidence": 0.9,
       "evidence": [
-        2307
+        2049,
+        2277,
+        2278,
+        2279,
+        2280,
+        2281,
+        2282,
+        2283,
+        2284,
+        2285,
+        2286,
+        2287,
+        2288,
+        2289,
+        2290,
+        2291,
+        2292,
+        2293,
+        2294,
+        2295,
+        2296,
+        2297,
+        2298,
+        2299,
+        2300
       ],
-      "metadata": {},
-      "parser": "generic"
+      "metadata": {
+        "outcome": "failed",
+        "expected": "\"(\ufffd': No such file or directory|Illegal byte sequence|Invalid or incomplete multibyte or wide character)\"",
+        "actual": "\"'D:\\\\a\\\\click\\\\click\\\\.tox\\\\py3.14\\\\tmp\\\\test_file_surrogates_type1_0\\\\\ufffd': The system cannot find the file specified\"",
+        "run_summary": {
+          "failed": 1,
+          "passed": 1913,
+          "skipped": 102,
+          "deselected": 31000,
+          "xfailed": 1,
+          "duration_seconds": 6.41
+        },
+        "tb_style": "short"
+      },
+      "parser": "pytest"
     },
     "related": [],
     "section_id": null,
-    "classification": "process_failure"
+    "classification": "test_failure"
   },
   "exit_code": 1,
   "raw_line_count": 2323,
@@ -246,8 +583,8 @@
   "stats": {
     "lines_processed": 2323,
     "sections": 18,
-    "diagnostics_detected": 1,
-    "parser_selected": "generic",
+    "diagnostics_detected": 2,
+    "parser_selected": "specialized",
     "parse_failures": 0,
     "truncated_lines": false,
     "lines_over_limit": 0,
