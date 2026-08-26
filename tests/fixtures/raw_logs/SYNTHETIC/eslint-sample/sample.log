@@ -1,0 +1,13 @@
+2026-08-26T09:05:00.0000000Z ##[group]Run npx eslint .
+2026-08-26T09:05:00.1000000Z npx eslint .
+2026-08-26T09:05:00.2000000Z ##[endgroup]
+2026-08-26T09:05:00.5000000Z
+2026-08-26T09:05:01.0000000Z src/index.js
+2026-08-26T09:05:01.1000000Z   12:9  error  'x' is assigned a value but never used  no-unused-vars
+2026-08-26T09:05:01.2000000Z   18:1  warning  Missing return type on function  consistent-return
+2026-08-26T09:05:01.3000000Z
+2026-08-26T09:05:01.4000000Z src/utils.js
+2026-08-26T09:05:01.5000000Z   5:3  error  Unexpected console statement  no-console
+2026-08-26T09:05:01.6000000Z
+2026-08-26T09:05:02.0000000Z ✖ 3 problems (2 errors, 1 warning)
+2026-08-26T09:05:02.1000000Z ##[error]Process completed with exit code 1.

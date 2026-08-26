@@ -16,3 +16,11 @@ they are not a substitute for a real fixture.
 **Regression note:** replace these with a real `ingest` capture from a red
 public jest/vitest run the first time one is seen (matches the project
 brief's Phase 26 note), and delete this directory once both are real.
+
+## tsc-sample / eslint-sample (Section 4)
+
+Same situation: hand-written to reproduce `tsc`'s two diagnostic shapes
+(`file:line:col - error TSxxxx: ...` and `file(line,col): error TSxxxx: ...`)
+and eslint's "stylish" reporter output, because no red public tsc/eslint
+`ingest` capture existed yet when Section 4 was built (2026-08-26). Swap in a
+real capture the first time one is seen.
