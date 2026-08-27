@@ -1,0 +1,13 @@
+{
+  "owner": "SYNTHETIC",
+  "repo": "secrets-sample",
+  "run_id": 0,
+  "run_attempt": 1,
+  "job_id": 0,
+  "job_name": "synthetic secret-masking fixture",
+  "workflow_name": "SYNTHETIC (hand-written, not a real capture)",
+  "conclusion": "failure",
+  "head_sha": "0000000000000000000000000000000000000000",
+  "html_url": "https://example.invalid/SYNTHETIC/secrets-sample",
+  "fetched_at": "2026-08-27T11:00:00+00:00"
+}

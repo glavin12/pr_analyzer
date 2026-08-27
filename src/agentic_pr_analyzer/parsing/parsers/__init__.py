@@ -14,6 +14,10 @@ PARSER_REGISTRY: tuple[Parser, ...] = (
     GenericParser(),
 )
 
+PARSER_NAMES: frozenset[str] = frozenset(p.name for p in PARSER_REGISTRY)
+"""Closed set of legal `stats["parser_selected"]`/`parsers_fired` values.
+Derived from the registry so it cannot drift out of sync with it."""
+
 __all__ = [
     "Parser",
     "GenericParser",
@@ -21,4 +25,5 @@ __all__ = [
     "JsTestParser",
     "CompilerParser",
     "PARSER_REGISTRY",
+    "PARSER_NAMES",
 ]

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1",
+  "schema_version": "1.3",
   "source": {
     "owner": "pallets",
     "repo": "click",
@@ -422,36 +422,36 @@
         },
         "parser": "pytest"
       },
-      "related": [],
+      "related": [
+        {
+          "type": "process_failure",
+          "severity": "error",
+          "tool": null,
+          "message": "Process completed with exit code 1.",
+          "file": null,
+          "line": null,
+          "column": null,
+          "source_range": {
+            "start": 2307,
+            "end": 2307
+          },
+          "stack_trace": null,
+          "test_id": null,
+          "exit_code": 1,
+          "confidence": 0.85,
+          "evidence": [
+            2307
+          ],
+          "metadata": {},
+          "parser": "pytest"
+        }
+      ],
       "section_id": null,
-      "classification": "test_failure"
-    },
-    {
-      "primary": {
-        "type": "process_failure",
-        "severity": "error",
-        "tool": null,
-        "message": "Process completed with exit code 1.",
-        "file": null,
-        "line": null,
-        "column": null,
-        "source_range": {
-          "start": 2307,
-          "end": 2307
-        },
-        "stack_trace": null,
-        "test_id": null,
-        "exit_code": 1,
-        "confidence": 0.85,
-        "evidence": [
-          2307
-        ],
-        "metadata": {},
-        "parser": "pytest"
-      },
-      "related": [],
-      "section_id": null,
-      "classification": "process_failure"
+      "classification": "test_failure",
+      "related_roles": [
+        "consequence"
+      ],
+      "key": "test_failure|error|pytest||tests/test_types.py|288||tests/test_types.py::test_file_surrogates[type1]|assertionerror: reg..."
     }
   ],
   "primary_cluster": {
@@ -573,21 +573,69 @@
       },
       "parser": "pytest"
     },
-    "related": [],
+    "related": [
+      {
+        "type": "process_failure",
+        "severity": "error",
+        "tool": null,
+        "message": "Process completed with exit code 1.",
+        "file": null,
+        "line": null,
+        "column": null,
+        "source_range": {
+          "start": 2307,
+          "end": 2307
+        },
+        "stack_trace": null,
+        "test_id": null,
+        "exit_code": 1,
+        "confidence": 0.85,
+        "evidence": [
+          2307
+        ],
+        "metadata": {},
+        "parser": "pytest"
+      }
+    ],
     "section_id": null,
-    "classification": "test_failure"
+    "classification": "test_failure",
+    "related_roles": [
+      "consequence"
+    ],
+    "key": "test_failure|error|pytest||tests/test_types.py|288||tests/test_types.py::test_file_surrogates[type1]|assertionerror: reg..."
   },
   "exit_code": 1,
   "raw_line_count": 2323,
   "truncated": false,
   "stats": {
+    "logs_processed": 1,
     "lines_processed": 2323,
+    "bytes_processed": 276764,
     "sections": 18,
+    "unknown_sections": 0,
     "diagnostics_detected": 2,
+    "diagnostics_deduplicated": 0,
+    "clusters_built": 1,
     "parser_selected": "specialized",
+    "parsers_fired": [
+      "pytest"
+    ],
+    "fallback_parser_used": false,
     "parse_failures": 0,
     "truncated_lines": false,
     "lines_over_limit": 0,
-    "diagnostics_truncated": false
+    "diagnostics_truncated": false,
+    "truncated_chars": false,
+    "evidence_truncated": false,
+    "tail_rescued": false,
+    "peak_lines_retained": 2323,
+    "fatal": false,
+    "secrets_masked": 1,
+    "secrets_masked_by_class": {
+      "http_auth": 1
+    },
+    "runtime": {
+      "parse_ms": 53
+    }
   }
 }

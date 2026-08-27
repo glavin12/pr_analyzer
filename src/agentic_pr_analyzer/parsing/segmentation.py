@@ -20,7 +20,11 @@ def build_sections(lines: list[LogLine]) -> tuple[tuple[LogLine, ...], tuple[Log
     next_id = 0
     new_lines: list[LogLine] = []
 
+    last_lineno = 0
+
     for line in lines:
+        last_lineno = line.raw_lineno
+
         if line.marker == WorkflowMarker.GROUP:
             parent_id = open_stack[-1] if open_stack else None
             sec_id = next_id
@@ -34,24 +38,26 @@ def build_sections(lines: list[LogLine]) -> tuple[tuple[LogLine, ...], tuple[Log
                 "parent_id": parent_id,
             }
             open_stack.append(sec_id)
-            for open_id in open_stack:
-                built[open_id]["end_lineno"] = line.raw_lineno
             new_lines.append(dataclasses.replace(line, section_id=sec_id))
             continue
 
         if line.marker == WorkflowMarker.ENDGROUP and open_stack:
-            for open_id in open_stack:
-                built[open_id]["end_lineno"] = line.raw_lineno
             sec_id = open_stack.pop()
+            built[sec_id]["end_lineno"] = line.raw_lineno
             new_lines.append(dataclasses.replace(line, section_id=sec_id))
             continue
 
         if open_stack:
-            for open_id in open_stack:
-                built[open_id]["end_lineno"] = line.raw_lineno
             new_lines.append(dataclasses.replace(line, section_id=open_stack[-1]))
         else:
             new_lines.append(line)
+
+    # Sections still open at EOF end at the last line seen. Once a group is
+    # open every subsequent line is inside it, so the last line overall *is*
+    # the last line in its scope -- which is why one assignment here replaces
+    # the old per-line rewrite of the whole stack (that was the O(n*depth)).
+    for open_id in open_stack:
+        built[open_id]["end_lineno"] = last_lineno
 
     sections = tuple(LogSection(**built[i]) for i in sorted(built))
     return tuple(new_lines), sections

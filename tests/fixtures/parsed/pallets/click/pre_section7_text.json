@@ -1,0 +1,26 @@
+{
+  "section_titles": [
+    "Runner Image Provisioner",
+    "Operating System",
+    "Runner Image",
+    "GITHUB_TOKEN Permissions",
+    "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "Getting Git version info",
+    "Determining repository object format",
+    "Initializing the repository",
+    "Disabling automatic garbage collection",
+    "Setting up auth",
+    "Fetching the repository",
+    "Determining the checkout info",
+    "Checking out the ref",
+    "Removing auth",
+    "Run astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9",
+    "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+    "Installed versions",
+    "Run uv run --locked --no-default-groups --group dev tox run"
+  ],
+  "diagnostic_messages": [
+    "AssertionError: Reg...",
+    "Process completed with exit code 1."
+  ]
+}

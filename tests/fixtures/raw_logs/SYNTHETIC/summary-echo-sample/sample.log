@@ -1,0 +1,12 @@
+2026-08-27T09:40:00.0000000Z ##[group]Run npm run typecheck
+2026-08-27T09:40:00.1000000Z npm run typecheck
+2026-08-27T09:40:00.2000000Z ##[endgroup]
+2026-08-27T09:40:00.5000000Z 
+2026-08-27T09:40:00.6000000Z > demo@1.0.0 typecheck
+2026-08-27T09:40:00.6500000Z > tsc --noEmit
+2026-08-27T09:40:00.7000000Z 
+2026-08-27T09:40:01.0000000Z src/auth.ts(42,7): error TS2339: Property 'x' does not exist on type 'User'.
+2026-08-27T09:40:01.1000000Z 
+2026-08-27T09:40:01.2000000Z Found 1 error in 1 file.
+2026-08-27T09:40:01.5000000Z ##[error]src/auth.ts(42,7): error TS2339: Property 'x' does not exist on type 'User'.
+2026-08-27T09:40:02.0000000Z ##[error]Process completed with exit code 2.

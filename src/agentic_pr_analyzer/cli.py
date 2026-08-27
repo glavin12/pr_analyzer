@@ -1,6 +1,7 @@
 import argparse
 import sys
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import requests
 
@@ -88,7 +89,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {e}", file=sys.stderr)
         return 1
     except requests.exceptions.RequestException as e:
-        print(f"error: could not reach GitHub API: {e}", file=sys.stderr)
+        # LEAK-2: never print str(e) or e.request.url/.path_url here.
+        # get_job_log (client.py) follows GitHub's 302 to a short-lived
+        # SIGNED blob URL, so a ConnectionError/ReadTimeout can be raised
+        # against that redirected URL; str(e) and .path_url both embed the
+        # full query string, SAS credentials included. Take only the bare
+        # path component (no query, no host) for a useful-but-safe hint.
+        request = getattr(e, "request", None)
+        path = urlsplit(request.url).path if request is not None and request.url else "?"
+        print(
+            f"error: could not reach GitHub API ({type(e).__name__}) for {path}",
+            file=sys.stderr,
+        )
         return 5
 
     return 0
