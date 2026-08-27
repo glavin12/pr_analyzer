@@ -28,5 +28,6 @@ dev = [
 testpaths = ["tests"]
 markers = [
     "integration: hits the real GitHub API over the network; excluded by default (run explicitly with `-m integration`).",
+    "perf: generates multi-MB logs and measures time/memory; slow, needs ~1 GB free, excluded by default (run explicitly with `-m perf`).",
 ]
-addopts = "-m 'not integration'"
+addopts = "-m 'not integration and not perf'"

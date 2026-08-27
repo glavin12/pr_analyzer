@@ -32,3 +32,10 @@ Thumbs.db
 # Captured logs are committed regression fixtures, not build noise —
 # they're what makes Slice 1 "Done" demonstrable and feed the eval
 # harness later.
+
+# Fixture-vetting policy (CLAUDE.md §7). Committed CI-log fixtures must come
+# from a workflow run readable by an anonymous, unauthenticated GitHub user --
+# those bytes are already world-readable, which is the whole justification for
+# committing real logs. Anything from a private repo, a self-hosted runner, or
+# a repo you do not control goes here instead and is never committed.
+tests/fixtures/raw_logs/PRIVATE/

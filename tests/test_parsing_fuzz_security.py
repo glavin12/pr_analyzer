@@ -86,3 +86,108 @@ def test_parse_log_masks_planted_github_token():
     report = parse_log(content)
     text = to_json(report)
     assert ("ghp_" + "a" * 36) not in text
+
+
+# ==========================================================================
+# Section 7: property-style fuzzing of the expanded matrix. Deterministic
+# pseudo-randomness via a seeded random.Random -- property-based *style*
+# without adding hypothesis (CLAUDE.md §6: keep the dependency surface small).
+# ==========================================================================
+
+import random
+import sys
+import time
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).parent))
+from secret_examples import EXAMPLE_SECRETS  # noqa: E402
+
+from agentic_pr_analyzer.parsing.sanitize import mask  # noqa: E402
+
+ANCHOR = Path("tests/fixtures/raw_logs/pallets/click/32472305359_96741461054.log")
+
+_MARKER_PREFIXES = ["", "##[group]", "##[error]", "##[command]", "[command]"]
+_ANSI_NOISE = ["", "\x1b[31m", "\x1b[0m", "\x1b[1;32m"]
+
+
+def _needle(cls: str, literal: str) -> str:
+    # rule 8 deliberately preserves the variable NAME and masks only the value.
+    return literal.split("=", 1)[1] if cls == "env_secret" else literal
+
+
+def test_planted_secret_never_survives_random_surroundings():
+    rng = random.Random(20260827)
+    classes = sorted(EXAMPLE_SECRETS)
+
+    for _ in range(500):
+        cls = rng.choice(classes)
+        literal = EXAMPLE_SECRETS[cls]
+        payload = (
+            rng.choice(_MARKER_PREFIXES)
+            + rng.choice(["", "prefix ", "Run deploy --token="])
+            + rng.choice(_ANSI_NOISE)
+            + literal
+            + rng.choice(_ANSI_NOISE)
+            + rng.choice(["", " suffix", '" trailing'])
+        )
+        timestamp = "2026-08-27T13:00:00.0000000Z " if rng.random() < 0.8 else ""
+        report = parse_log(timestamp + payload + "\n")
+        assert _needle(cls, literal) not in to_json(report), (cls, payload)
+
+
+def test_planted_secret_never_survives_random_line_position():
+    rng = random.Random(20260828)
+    base = ANCHOR.read_bytes().decode("utf-8", errors="replace").splitlines()[:200]
+    classes = sorted(EXAMPLE_SECRETS)
+
+    for _ in range(200):
+        cls = rng.choice(classes)
+        literal = EXAMPLE_SECRETS[cls]
+        lines = list(base)
+        lines.insert(
+            rng.randrange(len(lines) + 1),
+            "2026-08-27T13:00:00.0000000Z echo " + literal,
+        )
+        report = parse_log("\n".join(lines))
+        assert _needle(cls, literal) not in to_json(report), cls
+
+
+def test_mask_never_raises_on_random_bytes():
+    rng = random.Random(20260829)
+    for _ in range(1000):
+        s = "".join(chr(rng.randint(0, 255)) for _ in range(rng.randint(0, 80)))
+        assert isinstance(mask(s), str)
+
+
+def test_parse_log_still_never_raises_with_full_matrix():
+    """The total-function guarantee, re-asserted against the expanded matrix."""
+    rng = random.Random(20260830)
+    for _ in range(300):
+        s = "".join(
+            chr(rng.choice([rng.randint(0, 0x10FFFF), rng.randint(0, 0x7F), 0xDCFF]))
+            for _ in range(rng.randint(0, 50))
+        )
+        report = parse_log(s)
+        assert report is not None
+        to_json(report)
+
+
+@pytest.mark.parametrize(
+    "adversarial",
+    [
+        "a" * 20_000,
+        "A" * 10_000 + "=",
+        "://" + "a" * 10_000,
+        "Bearer " + "A" * 19_000,
+        "-----BEGIN " + "A" * 19_000,
+        "TOKEN=" + "x" * 19_000,
+    ],
+)
+def test_no_rule_exhibits_pathological_backtracking(adversarial):
+    """max_line_length is 20,000, so that is the real worst case. Generous
+    bound: this catches catastrophic backtracking, not slow machines."""
+    start = time.perf_counter()
+    mask(adversarial)
+    assert time.perf_counter() - start < 1.0

@@ -6,7 +6,7 @@ surface -- `parse_log`, `to_json`, `FailureReport`, `DiagnosticType`,
 """
 
 from .limits import ParseLimits
-from .model import SCHEMA_VERSION, DiagnosticType, FailureReport, to_dict, to_json
+from .model import SCHEMA_VERSION, DiagnosticRole, DiagnosticType, FailureReport, to_dict, to_json
 from .pipeline import parse_log
 
 __all__ = [
@@ -15,6 +15,7 @@ __all__ = [
     "to_dict",
     "FailureReport",
     "DiagnosticType",
+    "DiagnosticRole",
     "ParseLimits",
     "SCHEMA_VERSION",
 ]

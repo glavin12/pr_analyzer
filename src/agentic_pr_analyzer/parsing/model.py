@@ -1,10 +1,16 @@
 """Canonical data model for the deterministic log-parsing engine.
 
 All dataclasses are frozen (immutable evidence records). Enums serialize to
-their `.value` via `to_dict`/`to_json`. `to_json` uses `ensure_ascii=True`:
-the anchor fixture contains a lone Unicode surrogate (`\\udcff`, from a
-Windows FileNotFoundError message) that crashes `json.dumps` under
-`ensure_ascii=False` and would mangle the Windows console either way.
+their `.value` via `to_dict`/`to_json`. `to_json` uses `ensure_ascii=True`
+because a genuine lone surrogate crashes `json.dumps` under
+`ensure_ascii=False` and would mangle the Windows console either way
+(`tests/test_parsing_fuzz_security.py` exercises a real one).
+
+Correction (Section 6): this docstring used to claim the anchor fixture
+itself contains a lone surrogate. It does not -- line 2283 contains the six
+ASCII characters `\\udcff`, Python's *repr* of the surrogate inside a
+Windows FileNotFoundError message. The decision is still right; the
+evidence originally cited for it was not there.
 
 "primary diagnostic" / "failure origin candidate", never "root cause" -- a
 deterministic parser cannot justify causal claims.
@@ -21,7 +27,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..github.models import RawLog
 
-SCHEMA_VERSION = "1.1"
+SCHEMA_VERSION = "1.3"
 
 
 class Severity(Enum):
@@ -57,6 +63,23 @@ class WorkflowMarker(Enum):
     NOTICE = "notice"
 
 
+class DiagnosticRole(Enum):
+    """The role a diagnostic plays *inside its cluster* (Section 5).
+
+    Not a property of the diagnostic itself -- a parser never sets this; it
+    is assigned by `clustering.build_clusters` from the correlation rule
+    that attached the diagnostic. "Job-level" is not a role: it describes a
+    cluster whose only member is a PROCESS_FAILURE because nothing else in
+    the log was parseable.
+    """
+
+    PRIMARY = "primary"
+    SECONDARY = "secondary"
+    CONSEQUENCE = "consequence"
+    SUMMARY = "summary"
+    DUPLICATE = "duplicate"
+
+
 class DiagnosticType(Enum):
     PROCESS_FAILURE = "process_failure"
     UNKNOWN = "unknown"
@@ -69,7 +92,13 @@ class DiagnosticType(Enum):
     DEPENDENCY_ERROR = "dependency_error"
 
 
-@dataclass(frozen=True)
+# `slots=True`: LogLine is the only type materialized once per log line, so
+# it is the only one where removing the per-instance __dict__ is worth it.
+# Measured 27.2 MB -> 19.2 MB at the 200k-line ceiling. Compatible with
+# frozen=True and with dataclasses.replace (segmentation.py relies on both)
+# and with dataclasses.fields (model._serialize relies on that); LogLine is
+# never serialized into FailureReport, so this has no schema impact.
+@dataclass(frozen=True, slots=True)
 class LogLine:
     raw_lineno: int
     raw_text: str
@@ -92,8 +121,22 @@ class LogSection:
 
 @dataclass(frozen=True)
 class SourceRange:
-    # 1-based inclusive raw line numbers. Byte offsets are deferred to
-    # Section 6 (streaming) and will be documented there.
+    # 1-based inclusive raw line numbers. Byte offsets were deferred to
+    # Section 6 and are DECLINED there, deliberately:
+    #
+    #  * splitlines() discards which of its 9 boundaries was used, and they
+    #    encode to 1-3 UTF-8 bytes each, so byte offsets are not derivable
+    #    from the current split -- computing them means abandoning
+    #    splitlines(), the decision the anchor fixture's line numbers rest on
+    #    (see normalizer.py's module docstring).
+    #  * There are three coordinate systems here: raw file bytes, timestamp-
+    #    stripped payload chars, and masked text chars (mask() changes
+    #    length). Every other field in this model lives in the third. A byte
+    #    offset would be the only field in the first.
+    #  * Upgrade path if a surface ever needs seek-without-load: a separate
+    #    on-demand line_byte_offsets(content) side table, computed once,
+    #    O(n) ints total -- not 2 ints on every SourceRange, paid by 100% of
+    #    reports for a capability used by 0% of them.
     start: int
     end: int
 
@@ -141,6 +184,14 @@ class FailureCluster:
     related: tuple[Diagnostic, ...]
     section_id: int | None
     classification: DiagnosticType
+    # Section 5, additive. Index-aligned with `related`: related_roles[i] is
+    # the role of related[i]. `primary` is implicitly DiagnosticRole.PRIMARY
+    # and is not listed here. Invariant: len(related_roles) == len(related).
+    related_roles: tuple[DiagnosticRole, ...] = ()
+    # Section 5, additive. `clustering.dedup_key(primary)` -- the normalized
+    # identity these diagnostics were grouped under. Stable across runs, so
+    # the golden snapshot doubles as a readable spec of the dedup rules.
+    key: str | None = None
 
 
 @dataclass(frozen=True)

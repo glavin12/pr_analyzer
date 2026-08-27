@@ -78,7 +78,10 @@ def load_raw_log(log_path: Path) -> RawLog:
     translation on read, which would silently rewrite the exact `\r\n`
     bytes `save_raw_log` took care to preserve.
     """
-    content = log_path.read_bytes().decode("utf-8")
+    # errors="replace" mirrors client.py's decode of the same bytes. A strict
+    # decode here means a log that ingestion accepted can raise on read-back,
+    # and that raise happens *outside* parse_log's total-function guard.
+    content = log_path.read_bytes().decode("utf-8", errors="replace")
     meta = json.loads(log_path.with_suffix(".json").read_text(encoding="utf-8"))
     return RawLog(
         owner=meta["owner"],

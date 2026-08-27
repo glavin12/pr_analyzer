@@ -1,0 +1,32 @@
+2026-08-27T09:30:00.0000000Z ##[group]Run npm run build
+2026-08-27T09:30:00.1000000Z npm run build
+2026-08-27T09:30:00.2000000Z ##[endgroup]
+2026-08-27T09:30:00.5000000Z 
+2026-08-27T09:30:00.6000000Z > demo@1.0.0 build
+2026-08-27T09:30:00.6500000Z > tsc
+2026-08-27T09:30:00.7000000Z 
+2026-08-27T09:30:01.0000000Z src/auth.ts:42:7 - error TS2339: Property 'x' does not exist on type 'User'.
+2026-08-27T09:30:01.1000000Z src/db.ts:88:12 - error TS2554: Expected 2 arguments, but got 1.
+2026-08-27T09:30:01.2000000Z 
+2026-08-27T09:30:01.3000000Z Found 2 errors in 2 files.
+2026-08-27T09:30:02.0000000Z ##[group]Run npm test
+2026-08-27T09:30:02.1000000Z npm test
+2026-08-27T09:30:02.2000000Z ##[endgroup]
+2026-08-27T09:30:02.5000000Z 
+2026-08-27T09:30:03.0000000Z FAIL src/sum.test.js
+2026-08-27T09:30:03.1000000Z   sum
+2026-08-27T09:30:03.2000000Z     ✕ adds negative numbers (3 ms)
+2026-08-27T09:30:03.3000000Z 
+2026-08-27T09:30:03.4000000Z   ● sum › adds negative numbers
+2026-08-27T09:30:03.5000000Z 
+2026-08-27T09:30:03.6000000Z     expect(received).toBe(expected) // Object.is equality
+2026-08-27T09:30:03.7000000Z 
+2026-08-27T09:30:03.8000000Z     Expected: -3
+2026-08-27T09:30:03.9000000Z     Received: 3
+2026-08-27T09:30:04.0000000Z 
+2026-08-27T09:30:04.1000000Z       at Object.<anonymous> (src/sum.test.js:7:25)
+2026-08-27T09:30:04.2000000Z 
+2026-08-27T09:30:05.0000000Z Test Suites: 1 failed, 1 total
+2026-08-27T09:30:05.1000000Z Tests:       1 failed, 1 total
+2026-08-27T09:30:05.2000000Z Ran all test suites.
+2026-08-27T09:30:06.0000000Z ##[error]Process completed with exit code 1.
