@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -15,6 +16,7 @@ from .exceptions import (
     NoFailedRunsFoundError,
 )
 from .github import GitHubClient, ingest_latest_failure, load_raw_log
+from .mcp.adapter import build_summary
 from .parsing import parse_log, to_json
 from .parsing.model import LogSource
 
@@ -31,6 +33,10 @@ def build_parser() -> argparse.ArgumentParser:
         "parse", help="Parse a saved CI log fixture into a FailureReport (Section 1)."
     )
     parse.add_argument("logpath", help="Path to a .log file saved by `ingest` (needs its .json sidecar).")
+    analyze = sub.add_parser(
+        "analyze", help="Parse a CI log and print a tiered, evidence-backed failure summary (MCP adapter)."
+    )
+    analyze.add_argument("logpath", help="Path to a log file (local dev -- no allow-listing).")
     return parser
 
 
@@ -45,6 +51,16 @@ def main(argv: list[str] | None = None) -> int:
             raw = load_raw_log(log_path)
             report = parse_log(raw.content, LogSource.from_raw_log(raw))
             print(to_json(report))
+            return 0
+
+        if args.command == "analyze":
+            log_path = Path(args.logpath)
+            if not log_path.exists():
+                print(f"error: log file not found: {log_path}", file=sys.stderr)
+                return 4
+            content = log_path.read_text(encoding="utf-8", errors="surrogatepass")
+            report = parse_log(content, source=None)
+            print(json.dumps(build_summary(report, content, args.logpath), indent=2))
             return 0
 
         client = GitHubClient(token=load_settings().github_token)
