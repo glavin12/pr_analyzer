@@ -142,3 +142,37 @@ Documented deferrals, not oversights — don't build ahead of the current slice:
 ## 9. Full design doc
 
 See [`docs/project-brief.md`](docs/project-brief.md) for the complete architecture rationale, all key decisions and *why*, the full slice-by-slice build order, timeline, and the production-grade checklist.
+
+## 10. MCP: CI-log parser tool
+
+The deterministic parsing engine is also exposed as a stdio MCP server so a coding agent can call it directly instead of reading a raw CI log into its own context. Full design: [`docs/plans/section-8-mcp-adapter.md`](docs/plans/section-8-mcp-adapter.md).
+
+**What it is.** `analyze_ci_log(path)` reads a saved CI log server-side and returns a tiered, evidence-backed failure summary — cluster kind, bucketed confidence, the primary diagnostic's file/line/test id, and a short masked excerpt — never a diagnosis or a fix, and never the raw log body. Two drill-down tools go deeper on demand: `get_cluster_detail(reportId, clusterId)` (one cluster's full member list) and `get_full_report(reportId)` (every cluster at that depth — still bucketed/structured, never `to_json(report)` verbatim).
+
+**The fetch → parse → summarize recipe (Codex).** The whole point of this tool is that the raw log body never enters the agent's context. Follow this exactly:
+
+1. Find the failed run: `gh pr checks` (or `gh run list`) to get the failed run id.
+2. Fetch the failed job log **redirected to a file, never printed**:
+   ```bash
+   gh run view <run-id> --log-failed > "$TMPDIR/ci.log"
+   ```
+   The Bash tool result you see here is just an exit code — the log content itself never enters context.
+3. Call `analyze_ci_log("$TMPDIR/ci.log")` and reason only from the structured response it returns.
+4. **Never** `cat`, `grep`, `head`, `tail`, `less`, or open/Read that log file directly. The tool already returns cleaner, triaged information than the raw text; reading the file yourself defeats the entire point of having it.
+
+**Codex registration.** Add to `~/.codex/config.toml` (apply this yourself — Claude Code will not write to your home directory):
+```toml
+[mcp_servers.ci_log_parser]
+command = "uv"
+args = ["run", "agentic-pr-analyzer-mcp"]
+```
+The server is stdio-only, launched by the client per session — there is no port and no daemon to run separately.
+
+**Claude Code (fast-follow).** The same server registers via a project `.mcp.json` plus a `/ci-doctor` skill carrying the identical fetch → parse → summarize recipe. Not yet built — noted here so the next session doesn't have to rediscover this scope.
+
+**Security invariants.**
+- The tool schema is path-only (`path: str`) — no `content`/`log_text` field exists anywhere an agent could paste a log into.
+- The server reads the file server-side; the raw string never crosses back out in a response, a log message, or an error payload.
+- Every string reaching the response has already passed through the parser's single masking choke point, plus one more defense-in-depth `sanitize.mask` pass over the serialized JSON.
+- Zero network egress from the server — it imports only `agentic_pr_analyzer.parsing` (and the `mcp` SDK), never `agentic_pr_analyzer.github`.
+- The server never handles GitHub credentials; the calling agent's own `gh` auth does the fetch, entirely outside this tool's boundary.

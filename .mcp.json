@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ci_log_parser": {
+      "command": "uv",
+      "args": ["run", "agentic-pr-analyzer-mcp"]
+    }
+  }
+}
