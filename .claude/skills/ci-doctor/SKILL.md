@@ -42,9 +42,11 @@ would. So:
 
 3. **Fetch each failed job's RAW log to a file (redirect — do not print).**
    ```bash
-   gh api "repos/{owner}/{repo}/actions/jobs/<job-id>/logs" > "${TMPDIR:-/tmp}/ci_<job-id>.log"
+   gh api --allow-escape-sequences "repos/{owner}/{repo}/actions/jobs/<job-id>/logs" > "${TMPDIR:-/tmp}/ci_<job-id>.log"
    ```
-   Use the **raw** job-log API — *not* `gh run view --log`/`--log-failed`. That
+   `--allow-escape-sequences` is required: CI logs contain ANSI escapes, and
+   `gh api` otherwise refuses to write them to a non-terminal and produces an
+   empty 0-byte file. Use the **raw** job-log API — *not* `gh run view --log`/`--log-failed`. That
    reformats every line with a job-name and step-name prefix (tab-separated),
    which pushes the timestamp off the start of the line; the parser detects
    GitHub Actions by a leading timestamp and reads `##[group]`/`##[error]`

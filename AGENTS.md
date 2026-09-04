@@ -155,8 +155,9 @@ The deterministic parsing engine is also exposed as a stdio MCP server so a codi
 2. Get the failed job id(s) — a run can have several — then fetch each job's **raw** log **redirected to a file, never printed**:
    ```bash
    job_id=$(gh run view <run-id> --json jobs -q '.jobs[] | select(.conclusion=="failure") | .databaseId' | head -1)
-   gh api "repos/{owner}/{repo}/actions/jobs/$job_id/logs" > "$TMPDIR/ci.log"
+   gh api --allow-escape-sequences "repos/{owner}/{repo}/actions/jobs/$job_id/logs" > "$TMPDIR/ci.log"
    ```
+   (`--allow-escape-sequences` is required — CI logs carry ANSI, and `gh api` otherwise refuses to write escapes to a file and leaves it empty.)
    Use the raw job-log API, **not** `gh run view --log`/`--log-failed`: that prefixes every line with a tab-separated job/step name, which shifts the timestamp off the line start and makes the parser fail to detect GitHub Actions (`##[error]`/`##[group]` markers go unread) — a false "no failures found". This endpoint returns the same bytes `ingest` captures, the format the parser is proven against; `gh api` fills `{owner}/{repo}` from the current repo and follows the 302 to the signed blob automatically. The Bash tool result you see here is just an exit code — the log content itself never enters context.
 3. Call `analyze_ci_log("$TMPDIR/ci.log")` and reason only from the structured response it returns.
 4. **Never** `cat`, `grep`, `head`, `tail`, `less`, or open/Read that log file directly. The tool already returns cleaner, triaged information than the raw text; reading the file yourself defeats the entire point of having it.
