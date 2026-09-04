@@ -12,14 +12,14 @@ AGENTS_MD = Path(__file__).resolve().parent.parent / "AGENTS.md"
 
 def test_recipe_redirects_log_to_a_file():
     text = AGENTS_MD.read_text(encoding="utf-8")
-    assert re.search(r"gh run view[^\n]*--log-failed[^\n]*>", text), (
-        "AGENTS.md should show `gh run view ... --log-failed` redirected to a file"
+    assert re.search(r"gh api[^\n]*jobs/[^\n]*logs[^\n]*>", text), (
+        "AGENTS.md should show the raw job-log API (`gh api .../jobs/<id>/logs`) redirected to a file"
     )
 
 
 def test_recipe_never_pipes_log_to_stdout():
     text = AGENTS_MD.read_text(encoding="utf-8")
-    assert not re.search(r"--log-failed\s*\|\s*cat", text)
+    assert not re.search(r"logs[\"']?\s*\|\s*cat", text)
     assert not re.search(r'^\s*cat\s+["\']?\$TMPDIR', text, re.MULTILINE)
 
 

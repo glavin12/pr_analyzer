@@ -30,7 +30,7 @@ agent's tool-call surface.
   parsing engine itself has avoided across seven sections.
 - **No GitHub auth or log-fetch in the server.** `github/client.py` and `github/ingestion.py`
   are not imported anywhere under `mcp/`. The calling agent already has its own way to obtain
-  a log — `gh run view --log`, a downloaded artifact, a fixture under
+  a log — the raw `gh api .../actions/jobs/<id>/logs` blob, a downloaded artifact, a fixture under
   `tests/fixtures/raw_logs/` — and hands the server a **path**, not a URL or a repo slug. This
   keeps the module boundary from `CLAUDE.md` §4 intact: GitHub API access stays a separate,
   untouched module tree.
