@@ -33,17 +33,33 @@ would. So:
    gh run list --limit 10
    ```
 
-2. **Fetch the failed job log to a file (redirect — do not print).**
+2. **Get the failed job id(s) for that run.** A run can have several failed
+   jobs — handle every id this returns, not just the first.
    ```bash
-   gh run view <run-id> --log-failed > "${TMPDIR:-/tmp}/ci_<run-id>.log"
+   gh run view <run-id> --json jobs \
+     -q '.jobs[] | select(.conclusion=="failure") | .databaseId'
    ```
-   `--log-failed` already filters to just the failed steps. The Bash result you
-   see is only an exit code — the log content does not enter your context.
 
-3. **Parse it.** Call the MCP tool with only the path:
-   `analyze_ci_log(path="${TMPDIR:-/tmp}/ci_<run-id>.log")`
+3. **Fetch each failed job's RAW log to a file (redirect — do not print).**
+   ```bash
+   gh api "repos/{owner}/{repo}/actions/jobs/<job-id>/logs" > "${TMPDIR:-/tmp}/ci_<job-id>.log"
+   ```
+   Use the **raw** job-log API — *not* `gh run view --log`/`--log-failed`. That
+   reformats every line with a job-name and step-name prefix (tab-separated),
+   which pushes the timestamp off the start of the line; the parser detects
+   GitHub Actions by a leading timestamp and reads `##[group]`/`##[error]`
+   markers, so the reformatted shape defeats detection and the parser reports a
+   false "no failures found". This endpoint returns the exact bytes `ingest`
+   captures (timestamped lines, `##[group]`/`##[error]` markers, BOM) — the
+   format the parser is proven against. `gh api` fills `{owner}/{repo}` from the
+   current repo and follows GitHub's 302 to the signed blob automatically. The
+   Bash result you see is only an exit code — the log content does not enter
+   your context.
 
-4. **Reason from the structured summary.** You get back a tiered
+4. **Parse each log.** Call the MCP tool with only the path, once per fetched
+   file: `analyze_ci_log(path="${TMPDIR:-/tmp}/ci_<job-id>.log")`
+
+5. **Reason from the structured summary.** You get back a tiered
    `FailureReport` summary: ranked failure clusters, each with a
    `primaryDiagnostic` (tool, kind, test name, file/line, message, a short
    masked excerpt, rule-based confidence), plus an `omitted` block telling you
@@ -52,7 +68,7 @@ would. So:
      (all related diagnostics, full stack frames).
    - `get_full_report(reportId)` — everything (deliberate, explicit call).
 
-5. **Explain and/or propose a fix** from that evidence. The tool never claims a
+6. **Explain and/or propose a fix** from that evidence. The tool never claims a
    root cause or writes a fix — that judgment is yours.
 
 ## Notes

@@ -152,11 +152,12 @@ The deterministic parsing engine is also exposed as a stdio MCP server so a codi
 **The fetch → parse → summarize recipe (Codex).** The whole point of this tool is that the raw log body never enters the agent's context. Follow this exactly:
 
 1. Find the failed run: `gh pr checks` (or `gh run list`) to get the failed run id.
-2. Fetch the failed job log **redirected to a file, never printed**:
+2. Get the failed job id(s) — a run can have several — then fetch each job's **raw** log **redirected to a file, never printed**:
    ```bash
-   gh run view <run-id> --log-failed > "$TMPDIR/ci.log"
+   job_id=$(gh run view <run-id> --json jobs -q '.jobs[] | select(.conclusion=="failure") | .databaseId' | head -1)
+   gh api "repos/{owner}/{repo}/actions/jobs/$job_id/logs" > "$TMPDIR/ci.log"
    ```
-   The Bash tool result you see here is just an exit code — the log content itself never enters context.
+   Use the raw job-log API, **not** `gh run view --log`/`--log-failed`: that prefixes every line with a tab-separated job/step name, which shifts the timestamp off the line start and makes the parser fail to detect GitHub Actions (`##[error]`/`##[group]` markers go unread) — a false "no failures found". This endpoint returns the same bytes `ingest` captures, the format the parser is proven against; `gh api` fills `{owner}/{repo}` from the current repo and follows the 302 to the signed blob automatically. The Bash tool result you see here is just an exit code — the log content itself never enters context.
 3. Call `analyze_ci_log("$TMPDIR/ci.log")` and reason only from the structured response it returns.
 4. **Never** `cat`, `grep`, `head`, `tail`, `less`, or open/Read that log file directly. The tool already returns cleaner, triaged information than the raw text; reading the file yourself defeats the entire point of having it.
 
