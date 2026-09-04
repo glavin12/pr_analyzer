@@ -1,0 +1,8 @@
+# Captured CI-log fixtures are parsed as raw bytes (github/models.py:load_raw_log
+# reads them with newline="" and no universal-newline translation), so their line
+# endings are load-bearing: stats.bytes_processed counts every byte, and one extra
+# "\r" per line shifts it. Pin them to LF so a Windows checkout does not autocrlf-
+# expand them to CRLF and diverge from Linux CI. Without this the golden snapshot
+# mismatched across platforms (276764 vs 274441 bytes on the click fixture).
+# See tests/test_parsing_golden_snapshot.py.
+tests/fixtures/raw_logs/** text eol=lf

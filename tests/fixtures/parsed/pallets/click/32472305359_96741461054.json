@@ -610,7 +610,7 @@
   "stats": {
     "logs_processed": 1,
     "lines_processed": 2323,
-    "bytes_processed": 276764,
+    "bytes_processed": 274441,
     "sections": 18,
     "unknown_sections": 0,
     "diagnostics_detected": 2,
@@ -635,7 +635,7 @@
       "http_auth": 1
     },
     "runtime": {
-      "parse_ms": 53
+      "parse_ms": 52
     }
   }
 }
